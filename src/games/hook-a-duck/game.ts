@@ -76,8 +76,27 @@ export function cast(state: HookADuckState, x: number): boolean {
   return true;
 }
 
-/** Advances the game by `dt` seconds. */
+/** The longest slice of time the hook falls by between catch checks: a pixel of travel. */
+const MAX_SLICE = 1 / HOOK_SPEED;
+
+/**
+ * Advances the game by `dt` seconds. While the hook is going down it moves a pixel at a time, so
+ * it still catches a duck it touches between frames.
+ */
 export function step(state: HookADuckState, dt: number): void {
+  if (state.hook.motion !== 'down') {
+    advance(state, dt);
+    return;
+  }
+  let left = dt;
+  do {
+    const slice = Math.min(left, MAX_SLICE);
+    advance(state, slice);
+    left -= slice;
+  } while (left > 0 && state.hook.motion === 'down');
+}
+
+function advance(state: HookADuckState, dt: number): void {
   const { hook } = state;
 
   state.ducks.forEach((duck, i) => {

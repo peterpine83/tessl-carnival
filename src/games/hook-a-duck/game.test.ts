@@ -66,6 +66,14 @@ describe('hook a duck', () => {
     expect(state.hook.motion).toBe('up');
   });
 
+  it('catches a duck the hook touches between frames', () => {
+    const state = createState();
+    cast(state, 399.2);
+    for (let i = 0; i < 7; i++) step(state, 0.04);
+    expect(state.hook.duck).toBe(6);
+    expect(state.score).toBe(state.ducks[6].value);
+  });
+
   it('scores nothing when the hook misses every duck', () => {
     const state = createState();
     state.ducks = [];
